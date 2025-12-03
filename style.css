@@ -36,7 +36,6 @@ html, body {
   overflow-y: auto; 
 }
 
-/* ドラッグ可能時のカーソル */
 .draggable-active {
   cursor: grab;
 }
@@ -114,7 +113,6 @@ button {
   margin-bottom: 20px; 
 }
 
-/* 画像を囲むボックス */
 #random-box {
   width: 260px;
   height: 260px;
@@ -125,16 +123,25 @@ button {
   justify-content: center;
   border-radius: 8px;
   overflow: hidden;
+  position: relative;
 }
 
-/* 💡 背景画像を表示するパネル */
-#random-image-panel {
+#random-image {
   width: 100%;
   height: 100%;
-  background-color: white !important; /* 背景色を確実に白に */
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none; 
+}
+
+#drag-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background: transparent;
 }
 
 #tiers-wrap { 
@@ -210,7 +217,7 @@ button {
   background: rgba(250,250,250,0.95) !important;
 }
 
-/* 💡 重要: 初期状態は非表示 */
+/* 💡 初期状態は非表示 */
 #overlay, #settings-overlay {
   position: fixed;
   top: 0;
