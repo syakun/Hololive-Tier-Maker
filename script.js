@@ -5,10 +5,11 @@
 document.addEventListener("DOMContentLoaded", () => {
   
   // ============================================================
-  // 💡 【追加修正】新しいタブが開くのを防ぐための全体設定
+  // 💡 【重要】新しいタブが開くのを防ぐための全体設定
   // ============================================================
   window.addEventListener("dragover", function(e) {
     e.preventDefault(); // ブラウザ標準のドラッグ動作をキャンセル
+    e.dataTransfer.dropEffect = "move"; // カーソルの見た目を「移動」にする
   }, false);
 
   window.addEventListener("drop", function(e) {
@@ -19,6 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const MAX_INDEX = 63;
   const ORIGINAL_IMAGES = [];
+  // 画像ファイル名を「0.png 〜 63.png」として読み込む
   for (let i = 0; i <= MAX_INDEX; i++) {
     const fileName = String(i); 
     ORIGINAL_IMAGES.push(`images/${fileName}.png`);
@@ -79,9 +81,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const themeInput = document.getElementById("theme-input");
   const themeDisplay = document.getElementById("theme-display");
   
-  const randomImageBox = document.getElementById("random-box");
-  const randomImage = document.getElementById("random-image"); 
-  const dragOverlay = document.getElementById("drag-overlay"); 
+  const randomImage = document.getElementById("random-image");
+  const dragOverlay = document.getElementById("drag-overlay");
   
   const overlay = document.getElementById("overlay");
   const completionActions = document.getElementById("completion-actions");
@@ -213,6 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ph.addEventListener("drop", e => {
           e.preventDefault();
           ph.classList.remove("drag-over");
+          // 内部変数からURLを取得して処理
           if (draggedImageUrl) {
               placeIntoPlaceholder(ph, draggedImageUrl);
           }
@@ -289,14 +291,14 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       return;
     }
+    // 内部変数にURLを保存
     draggedImageUrl = currentImageSrc;
     
-    // 💡 アドオン対策: 
-    // 標準の text/plain だとURLとして認識されやすいので、
-    // 独自のデータ形式もセットしつつ、デフォルトのURL遷移を防ぐ準備をする。
-    e.dataTransfer.setData("text/plain", currentImageSrc);
-    
-    // ドラッグ中の見た目はセット
+    // 💡 重要修正: URLを含まないダミーデータをセットする
+    // これによりブラウザは「これはリンクではない」と判断し、タブを開かなくなる
+    e.dataTransfer.setData("text/plain", "dragged-item");
+    e.dataTransfer.effectAllowed = "move";
+
     try {
       e.dataTransfer.setDragImage(randomImage, 40, 40); 
     } catch (err) { /* ignore */ }
