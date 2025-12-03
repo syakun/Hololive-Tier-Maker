@@ -3,26 +3,22 @@
    ------------------------------ */
 
 document.addEventListener("DOMContentLoaded", () => {
-  // 💡 修正: 0.png ～ 63.png を読み込む設定に変更
-  const MAX_INDEX = 63; 
+  // 💡 修正: 画像ファイル名を「0.png 〜 63.png」として読み込む
+  const MAX_INDEX = 63;
   const ORIGINAL_IMAGES = [];
   for (let i = 0; i <= MAX_INDEX; i++) {
-    // ゼロ埋め(padStart)を削除し、そのままの数字(0, 1, 2...)を使用
-    const fileName = String(i); 
+    const fileName = String(i); // 0, 1, 2...
     ORIGINAL_IMAGES.push(`images/${fileName}.png`);
   }
 
   const TIER_INITIAL_LIMITS = { S: 1, A: 2, B: 3, C: 4, D: 5 };
   const INITIAL_CATEGORIES = { JP: true, ID: true, EN: true, DEV_IS: true };
 
-  // 💡 画像範囲の定義も 0～63 に合わせて修正
-  // (※実際の画像の並び順に合わせて微調整が必要ですが、一旦等分などの目安で設定します)
-  // もしJP/ID/ENの区切りが画像の番号順と違う場合は、ここの数値を調整してください。
   const IMAGE_RANGES = {
-    JP: [[0, 29], [63, 63]], // 例: 0.png～29.png と 63.png
-    ID: [[30, 38]],          // 例: 30.png～38.png
-    EN: [[39, 53]],          // 例: 39.png～53.png
-    DEV_IS: [[54, 62]]       // 例: 54.png～62.png
+    JP: [[0, 29], [63, 63]],
+    ID: [[30, 38]],
+    EN: [[39, 53]],
+    DEV_IS: [[54, 62]]
   };
 
   const THEME_CANDIDATES = [
@@ -59,7 +55,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const RANDOM_DURATION = 4000;
   let stopTimeoutId = null;
   let isRunning = false;
-  
   let draggedImageUrl = null;
   
   let currentTierLimits = {...TIER_INITIAL_LIMITS}; 
@@ -71,11 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const themeInput = document.getElementById("theme-input");
   const themeDisplay = document.getElementById("theme-display");
   
-  const randomImageBox = document.getElementById("random-box");
-  // const randomImagePanel = document.getElementById("random-image-panel"); 
-  // ↑前回のコードの名残ですが、index.htmlで img と div どちらを使っているかによります。
-  // 今回は「確実な表示」のため imgタグ + 透明カバー方式 を採用している前提で書きます。
-  
+  // 💡 修正: 正しいIDを取得
   const randomImage = document.getElementById("random-image"); // imgタグ
   const dragOverlay = document.getElementById("drag-overlay"); // 透明カバー
   
@@ -136,6 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   settingsBtn.addEventListener("click", () => {
       syncSettingsToUI(); 
+      settingsOverlay.classList.remove("hidden-overlay");
       settingsOverlay.style.display = "flex";
   });
 
@@ -155,10 +147,12 @@ document.addEventListener("DOMContentLoaded", () => {
       currentTierLimits = limits;
       currentCategories = categories;
       settingsOverlay.style.display = "none";
+      settingsOverlay.classList.add("hidden-overlay");
   });
 
   cancelSettingsBtn.addEventListener("click", () => {
       settingsOverlay.style.display = "none";
+      settingsOverlay.classList.add("hidden-overlay");
   });
 
   function getSelectedImagePool(categories) {
@@ -172,7 +166,6 @@ document.addEventListener("DOMContentLoaded", () => {
               const ranges = IMAGE_RANGES[category];
               ranges.forEach(range => {
                 for (let i = range[0]; i <= range[1]; i++) {
-                  // 💡 修正: ここもゼロ埋めなしのファイル名に変更
                   const fileName = String(i); 
                   selectedImages.push(`images/${fileName}.png`);
                 }
@@ -197,8 +190,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const ph = document.createElement("div");
         ph.className = "placeholder empty";
         ph.dataset.filled = "false";
-        ph.addEventListener("dragover", e => { e.preventDefault(); ph.classList.add("drag-over"); });
-        ph.addEventListener("dragleave", e => { ph.classList.remove("drag-over"); });
+        ph.addEventListener("dragover", e => { 
+            e.preventDefault(); 
+            ph.classList.add("drag-over"); 
+        });
+        ph.addEventListener("dragleave", e => { 
+            ph.classList.remove("drag-over"); 
+        });
         ph.addEventListener("drop", e => {
           e.preventDefault();
           ph.classList.remove("drag-over");
@@ -241,17 +239,18 @@ document.addEventListener("DOMContentLoaded", () => {
   function startRandomCycle() {
     if (isRunning) return;
     if (images.length === 0) {
-      randomImage.src = ""; // 画像がない場合は空に
+      randomImage.src = "";
       randomArea.classList.add("hidden"); 
       return;
     }
 
     isRunning = true;
-    dragOverlay.draggable = false; // サイクル中はドラッグ禁止
+    dragOverlay.draggable = false; 
 
     intervalId = setInterval(() => {
       const idx = Math.floor(Math.random() * images.length);
       currentImageSrc = images[idx];
+      // 💡 修正: 画像タグにURLをセット
       randomImage.src = currentImageSrc;
     }, 50);
 
@@ -268,7 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
     clearTimeout(stopTimeoutId);
     stopTimeoutId = null;
 
-    // 停止後、透明カバーをドラッグ可能にする
+    // 💡 停止後、透明カバーをドラッグ可能にする
     dragOverlay.draggable = true;
     dragOverlay.classList.add('draggable-active');
     dragOverlay.addEventListener("dragstart", dragStartHandler);
@@ -282,6 +281,7 @@ document.addEventListener("DOMContentLoaded", () => {
     draggedImageUrl = currentImageSrc;
     e.dataTransfer.setData("text/plain", currentImageSrc);
     try {
+      // 見た目は下の画像（randomImage）を使う
       e.dataTransfer.setDragImage(randomImage, 40, 40); 
     } catch (err) { /* ignore */ }
   }
@@ -338,12 +338,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function showCompletePopup() {
+    overlay.classList.remove("hidden-overlay");
     overlay.style.display = "flex";
     completionActions.classList.add("hidden"); 
   }
 
   viewBtn.addEventListener("click", () => {
     overlay.style.display = "none";
+    overlay.classList.add("hidden-overlay");
     completionActions.classList.remove("hidden");
   });
 

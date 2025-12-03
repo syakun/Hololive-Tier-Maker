@@ -114,7 +114,7 @@ button {
   margin-bottom: 20px; 
 }
 
-/* 💡 画像を囲むボックス (relative必須) */
+/* 画像を囲むボックス */
 #random-box {
   width: 260px;
   height: 260px;
@@ -125,27 +125,16 @@ button {
   justify-content: center;
   border-radius: 8px;
   overflow: hidden;
-  position: relative; /* 重ね合わせの基準 */
 }
 
-/* 💡 実際に表示される画像 */
-#random-image {
+/* 💡 背景画像を表示するパネル */
+#random-image-panel {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  user-select: none;
-  pointer-events: none; /* 下にある画像はクリックさせない */
-}
-
-/* 💡 透明な操作用カバー (これをドラッグする) */
-#drag-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 10; /* 画像より上に配置 */
-  background: transparent; /* 透明 */
+  background-color: white !important; /* 背景色を確実に白に */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 #tiers-wrap { 
@@ -221,7 +210,7 @@ button {
   background: rgba(250,250,250,0.95) !important;
 }
 
-/* ポップアップは初期状態非表示 */
+/* 💡 重要: 初期状態は非表示 */
 #overlay, #settings-overlay {
   position: fixed;
   top: 0;

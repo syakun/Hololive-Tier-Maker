@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="color-scheme" content="light">
+  <meta name="darkreader-lock">
   <title>Hololive Tier Maker</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -34,8 +35,7 @@
 
     <div id="random-area">
       <div id="random-box">
-        <img id="random-image" src="" alt="" draggable="false">
-        <div id="drag-overlay" draggable="false"></div>
+        <div id="random-image-panel" draggable="false"></div>
       </div>
     </div>
     
@@ -62,7 +62,7 @@
 </div>
 </div>
 
-<div id="settings-overlay">
+<div id="settings-overlay" class="hidden-overlay">
   <div id="settings-popup">
     <h2>Tierメーカー設定</h2>
 
@@ -99,7 +99,7 @@
       </div>
     </div>
 
-    <div class="popup-actions">
+    <div class="controls">
       <button id="save-settings-btn">設定を保存</button>
       <button id="cancel-settings-btn">キャンセル</button>
     </div>
