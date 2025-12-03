@@ -1,14 +1,23 @@
+/* ------------------------------
+   Hololive Tier Maker - style.css
+   ------------------------------ */
+
+:root {
+  color-scheme: light;
+}
+
 html, body {
   height: 100%;
   margin: 0;
   padding: 0;
   font-family: "Noto Sans JP", sans-serif;
-  background-image: url('images/background.png');
+  background-image: url('images/background.png') !important;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  color: #111;
+  background-color: #fff !important; 
+  color: #111 !important; 
   display: flex;
   justify-content: center;
   align-items: center; 
@@ -19,12 +28,20 @@ html, body {
   max-width: 1000px; 
   margin: 10px auto; 
   padding: 15px;
-  background: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.85) !important;
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.25);
   width: 98%; 
   max-height: calc(100vh - 40px); 
   overflow-y: auto; 
+}
+
+/* ドラッグ可能時のカーソル */
+.draggable-active {
+  cursor: grab;
+}
+.draggable-active:active {
+  cursor: grabbing;
 }
 
 #start-screen {
@@ -47,6 +64,8 @@ html, body {
   font-size: 16px;
   border-radius: 6px;
   border: 1px solid #bbb;
+  background-color: #fff !important;
+  color: #000 !important;
 }
 
 #update-theme-btn {
@@ -66,7 +85,8 @@ html, body {
     margin-top: 10px;
 }
 .secondary-controls button {
-    background: #f0f0f0;
+    background: #f0f0f0 !important;
+    color: #333 !important;
     font-size: 16px;
 }
 
@@ -94,23 +114,38 @@ button {
   margin-bottom: 20px; 
 }
 
+/* 💡 画像を囲むボックス (relative必須) */
 #random-box {
   width: 260px;
   height: 260px;
   border: 3px solid #222;
-  background: white;
+  background: white !important;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
   overflow: hidden;
+  position: relative; /* 重ね合わせの基準 */
 }
 
+/* 💡 実際に表示される画像 */
 #random-image {
   width: 100%;
   height: 100%;
   object-fit: contain;
   user-select: none;
+  pointer-events: none; /* 下にある画像はクリックさせない */
+}
+
+/* 💡 透明な操作用カバー (これをドラッグする) */
+#drag-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10; /* 画像より上に配置 */
+  background: transparent; /* 透明 */
 }
 
 #tiers-wrap { 
@@ -126,7 +161,7 @@ button {
   display: flex;
   align-items: center;
   margin: 5px 0; 
-  background: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.8) !important;
   padding: 8px;
   border-radius: 6px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
@@ -134,7 +169,7 @@ button {
 
 .tier-label {
   width: 70px;
-  color: white;
+  color: white !important;
   font-size: 20px;
   font-weight: 700;
   padding: 10px; 
@@ -143,11 +178,11 @@ button {
   margin-right: 12px;
 }
 
-.s { background: #ff5959; }
-.a { background: #ffa559; color: #111 }
-.b { background: #ffe15d; color: #111 }
-.c { background: #59ffa7; color: #111 }
-.d { background: #59b0ff; color: #111 }
+.s { background: #ff5959 !important; }
+.a { background: #ffa559 !important; color: #111 !important; }
+.b { background: #ffe15d !important; color: #111 !important; }
+.c { background: #59ffa7 !important; color: #111 !important; }
+.d { background: #59b0ff !important; color: #111 !important; }
 
 .slot {
   flex-grow: 1;
@@ -162,7 +197,7 @@ button {
   width: 80px; 
   height: 80px; 
   border: 2px solid #000;
-  background: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.9) !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -170,7 +205,7 @@ button {
 }
 
 .placeholder.empty {
-  background: rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.6) !important;
 }
 
 .placeholder img {
@@ -183,39 +218,41 @@ button {
 
 .placeholder.drag-over {
   outline: 3px dashed #333;
-  background: rgba(250,250,250,0.95);
+  background: rgba(250,250,250,0.95) !important;
 }
 
+/* ポップアップは初期状態非表示 */
 #overlay, #settings-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.65);
-  display: flex;
+  background: rgba(0,0,0,0.65) !important;
+  display: none; 
   justify-content: center;
   align-items: center;
   z-index: 9999;
 }
 
 #popup, #settings-popup {
-  background: #fff;
+  background: #fff !important;
   padding: 26px 30px;
   border-radius: 12px;
   text-align: center;
   max-width: 90%;
+  color: #333 !important;
 }
 #settings-popup {
     width: 600px; 
 }
-
 
 #settings-popup h3 {
     margin-top: 20px;
     margin-bottom: 10px;
     border-bottom: 1px solid #eee;
     padding-bottom: 5px;
+    color: #333 !important;
 }
 
 #image-category-selection {
@@ -228,14 +265,15 @@ button {
 #image-category-selection label {
     font-size: 16px;
     cursor: pointer;
-    background: #eee;
+    background: #eee !important;
+    color: #333 !important;
     padding: 8px 12px;
     border-radius: 4px;
     transition: background 0.2s;
 }
 #image-category-selection label:has(input:checked) {
-    background: #59b0ff;
-    color: white;
+    background: #59b0ff !important;
+    color: white !important;
 }
 #image-category-selection input[type="checkbox"] {
     margin-right: 5px;
@@ -261,6 +299,8 @@ button {
     text-align: center;
     border: 1px solid #ccc;
     border-radius: 4px;
+    background: #fff !important;
+    color: #333 !important;
 }
 
 .popup-actions {
@@ -277,6 +317,6 @@ button {
 
 .hint {
   margin-top: 12px;
-  color: #444;
+  color: #444 !important;
   font-size: 14px;
 }

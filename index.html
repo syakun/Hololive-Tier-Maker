@@ -2,11 +2,13 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
+  <meta name="color-scheme" content="light">
   <title>Hololive Tier Maker</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
+<div id="wrapper">
 <div id="app">
 
   <div id="start-screen">
@@ -32,7 +34,8 @@
 
     <div id="random-area">
       <div id="random-box">
-        <img id="random-image" src="" alt="ランダム画像" draggable="false">
+        <img id="random-image" src="" alt="" draggable="false">
+        <div id="drag-overlay" draggable="false"></div>
       </div>
     </div>
     
@@ -40,31 +43,26 @@
         <div id="tiers-wrap">
           <h2 id="theme-display">Tier表</h2> 
           <div id="tiers">
-    
             <div class="tier-row" data-tier="S"><div class="tier-label s">S</div><div class="slot"></div></div>
-    
             <div class="tier-row" data-tier="A"><div class="tier-label a">A</div><div class="slot"></div></div>
-    
             <div class="tier-row" data-tier="B"><div class="tier-label b">B</div><div class="slot"></div></div>
-    
             <div class="tier-row" data-tier="C"><div class="tier-label c">C</div><div class="slot"></div></div>
-    
             <div class="tier-row" data-tier="D"><div class="tier-label d">D</div><div class="slot"></div></div>
-    
           </div>
         </div>
     </div>
     
     <div class="controls action-controls hidden" id="completion-actions">
       <button id="save-btn">画像として保存</button>
-      <button id="tweet-btn">X (旧Twitter) に投稿</button>
+      <button id="tweet-btn">X (Twitter) に投稿</button>
       <button id="main-restart-btn">最初からやり直す</button>
     </div>
   </div>
 
 </div>
+</div>
 
-<div id="settings-overlay" class="hidden-overlay">
+<div id="settings-overlay">
   <div id="settings-popup">
     <h2>Tierメーカー設定</h2>
 
@@ -101,7 +99,7 @@
       </div>
     </div>
 
-    <div class="controls">
+    <div class="popup-actions">
       <button id="save-settings-btn">設定を保存</button>
       <button id="cancel-settings-btn">キャンセル</button>
     </div>
