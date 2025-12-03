@@ -5,23 +5,16 @@
 document.addEventListener("DOMContentLoaded", () => {
   
   // ============================================================
-  // 💡 【決定版】新しいタブが開くのを防ぐ強力な設定
+  // 💡 全体設定: ブラウザ標準のドラッグ＆ドロップ動作を強力に無効化
   // ============================================================
-  function preventDefaults(e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-  
-  // 画面全体でドラッグ＆ドロップの標準動作（タブ開きなど）を無効化
-  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    window.addEventListener(eventName, preventDefaults, { passive: false });
-  });
-
-  // ドロップ時のエフェクトを「移動」に指定（禁止マークを出さない）
-  window.addEventListener("dragover", e => {
+  window.addEventListener("dragover", function(e) {
+    e.preventDefault(); // 標準動作（禁止マークなど）をキャンセル
     e.dataTransfer.dropEffect = "move";
-  });
-  // ============================================================
+  }, false);
+
+  window.addEventListener("drop", function(e) {
+    e.preventDefault(); // 標準動作（タブを開く、ファイルを開く）をキャンセル
+  }, false);
 
 
   const MAX_INDEX = 63;
@@ -76,6 +69,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const RANDOM_DURATION = 4000;
   let stopTimeoutId = null;
   let isRunning = false;
+  
+  // 💡 アプリ内部でのみ使うデータ受け渡し用変数
   let draggedImageUrl = null;
   
   let currentTierLimits = {...TIER_INITIAL_LIMITS}; 
@@ -87,9 +82,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const themeInput = document.getElementById("theme-input");
   const themeDisplay = document.getElementById("theme-display");
   
-  // 画像要素とカバー要素
-  const randomImage = document.getElementById("random-image");
-  const dragOverlay = document.getElementById("drag-overlay");
+  // 💡 random-image-panel を取得
+  const randomImagePanel = document.getElementById("random-image-panel");
   
   const overlay = document.getElementById("overlay");
   const completionActions = document.getElementById("completion-actions");
@@ -211,15 +205,21 @@ document.addEventListener("DOMContentLoaded", () => {
         const ph = document.createElement("div");
         ph.className = "placeholder empty";
         ph.dataset.filled = "false";
-        
-        // ドラッグ＆ドロップイベント
+        ph.addEventListener("dragover", e => { 
+            e.preventDefault(); 
+            ph.classList.add("drag-over"); 
+        });
+        ph.addEventListener("dragleave", e => { 
+            ph.classList.remove("drag-over"); 
+        });
         ph.addEventListener("drop", e => {
-          // 内部変数からURLを取得
+          e.preventDefault();
+          ph.classList.remove("drag-over");
+          // 💡 内部変数からURLを取得して配置
           if (draggedImageUrl) {
               placeIntoPlaceholder(ph, draggedImageUrl);
           }
         });
-        
         slot.appendChild(ph);
       }
     });
@@ -255,18 +255,19 @@ document.addEventListener("DOMContentLoaded", () => {
   function startRandomCycle() {
     if (isRunning) return;
     if (images.length === 0) {
-      randomImage.src = "";
+      randomImagePanel.style.backgroundImage = 'none';
       randomArea.classList.add("hidden"); 
       return;
     }
 
     isRunning = true;
-    dragOverlay.draggable = false; 
+    randomImagePanel.draggable = false; 
 
     intervalId = setInterval(() => {
       const idx = Math.floor(Math.random() * images.length);
       currentImageSrc = images[idx];
-      randomImage.src = currentImageSrc;
+      // 背景画像としてセット
+      randomImagePanel.style.backgroundImage = `url('${currentImageSrc}')`;
     }, 50);
 
     stopTimeoutId = setTimeout(() => {
@@ -282,9 +283,9 @@ document.addEventListener("DOMContentLoaded", () => {
     clearTimeout(stopTimeoutId);
     stopTimeoutId = null;
 
-    dragOverlay.draggable = true;
-    dragOverlay.classList.add('draggable-active');
-    dragOverlay.addEventListener("dragstart", dragStartHandler);
+    randomImagePanel.setAttribute("draggable", "true");
+    randomImagePanel.classList.add('draggable-active');
+    randomImagePanel.addEventListener("dragstart", dragStartHandler);
   }
 
   function dragStartHandler(e) {
@@ -292,18 +293,19 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       return;
     }
-    // URLを内部変数に保存
+    // 💡 ここが重要！URLは内部変数にだけ保存
     draggedImageUrl = currentImageSrc;
     
-    // 💡 タブが開くのを防ぐため、URLではなく空のテキストをセット
-    e.dataTransfer.setData("text/plain", ""); 
+    // 💡 ブラウザには「ダミーのテキスト」を渡す（これでタブが開かない！）
+    e.dataTransfer.setData("text/plain", "dragged_tier_item");
     e.dataTransfer.effectAllowed = "move";
 
-    // 💡 ドラッグ中の見た目は「今表示されている画像要素(randomImage)」を使う
-    // これならロード待ちがなく、確実に表示されます
-    if (randomImage) {
-        e.dataTransfer.setDragImage(randomImage, 40, 40);
-    }
+    // 見た目（ゴースト）の設定
+    try {
+      const img = new Image();
+      img.src = currentImageSrc;
+      e.dataTransfer.setDragImage(img, 40, 40); 
+    } catch (err) { /* ignore */ }
   }
   
   function placeIntoPlaceholder(ph, src) {
@@ -320,9 +322,9 @@ document.addEventListener("DOMContentLoaded", () => {
     removeImageFromPool(src);
 
     draggedImageUrl = null;
-    dragOverlay.removeEventListener("dragstart", dragStartHandler);
-    dragOverlay.draggable = false;
-    dragOverlay.classList.remove('draggable-active');
+    randomImagePanel.removeEventListener("dragstart", dragStartHandler);
+    randomImagePanel.setAttribute("draggable", "false");
+    randomImagePanel.classList.remove('draggable-active');
 
     if (!checkAllFilled()) {
       setTimeout(() => {
@@ -340,9 +342,9 @@ document.addEventListener("DOMContentLoaded", () => {
       clearTimeout(stopTimeoutId);
       isRunning = false;
       
-      dragOverlay.draggable = false;
-      dragOverlay.removeEventListener("dragstart", dragStartHandler);
-      randomImage.src = "";
+      randomImagePanel.setAttribute("draggable", "false");
+      randomImagePanel.removeEventListener("dragstart", dragStartHandler);
+      randomImagePanel.style.backgroundImage = 'none';
       randomArea.classList.add("hidden"); 
     } else {
       currentImageSrc = null;
@@ -424,10 +426,10 @@ document.addEventListener("DOMContentLoaded", () => {
     currentImageSrc = null;
     draggedImageUrl = null;
 
-    randomImage.src = "";
-    dragOverlay.draggable = false;
-    dragOverlay.removeEventListener("dragstart", dragStartHandler);
-    dragOverlay.classList.remove('draggable-active');
+    randomImagePanel.style.backgroundImage = 'none';
+    randomImagePanel.setAttribute("draggable", "false");
+    randomImagePanel.removeEventListener("dragstart", dragStartHandler);
+    randomImagePanel.classList.remove('draggable-active');
 
     startScreen.classList.remove("hidden");
     mainScreen.classList.add("hidden");

@@ -113,6 +113,7 @@ button {
   margin-bottom: 20px; 
 }
 
+/* 画像を囲むボックス */
 #random-box {
   width: 260px;
   height: 260px;
@@ -126,22 +127,14 @@ button {
   position: relative;
 }
 
-#random-image {
+/* 背景画像を表示する要素 */
+#random-image-panel {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  user-select: none;
-  pointer-events: none; 
-}
-
-#drag-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 10;
-  background: transparent;
+  background-color: white !important;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 #tiers-wrap { 
@@ -217,6 +210,7 @@ button {
   background: rgba(250,250,250,0.95) !important;
 }
 
+/* 💡 修正箇所: display: none; に戻しました */
 #overlay, #settings-overlay {
   position: fixed;
   top: 0;
