@@ -113,7 +113,6 @@ button {
   margin-bottom: 20px; 
 }
 
-/* 画像を囲むボックス */
 #random-box {
   width: 260px;
   height: 260px;
@@ -127,14 +126,22 @@ button {
   position: relative;
 }
 
-/* 背景画像を表示する要素 */
-#random-image-panel {
+#random-image {
   width: 100%;
   height: 100%;
-  background-color: white !important;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none; 
+}
+
+#drag-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background: transparent;
 }
 
 #tiers-wrap { 
@@ -210,7 +217,6 @@ button {
   background: rgba(250,250,250,0.95) !important;
 }
 
-/* ポップアップは初期状態非表示 */
 #overlay, #settings-overlay {
   position: fixed;
   top: 0;

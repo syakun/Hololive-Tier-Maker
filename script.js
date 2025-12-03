@@ -5,16 +5,23 @@
 document.addEventListener("DOMContentLoaded", () => {
   
   // ============================================================
-  // 💡 全体設定: ブラウザ標準のドラッグ＆ドロップ動作を無効化
+  // 💡 【決定版】新しいタブが開くのを防ぐ強力な設定
   // ============================================================
-  window.addEventListener("dragover", function(e) {
-    e.preventDefault(); // 標準動作（禁止マークなど）をキャンセル
-    e.dataTransfer.dropEffect = "move";
-  }, false);
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  
+  // 画面全体でドラッグ＆ドロップの標準動作（タブ開きなど）を無効化
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    window.addEventListener(eventName, preventDefaults, { passive: false });
+  });
 
-  window.addEventListener("drop", function(e) {
-    e.preventDefault(); // 標準動作（タブを開く、ファイルを開く）をキャンセル
-  }, false);
+  // ドロップ時のエフェクトを「移動」に指定（禁止マークを出さない）
+  window.addEventListener("dragover", e => {
+    e.dataTransfer.dropEffect = "move";
+  });
+  // ============================================================
 
 
   const MAX_INDEX = 63;
@@ -69,8 +76,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const RANDOM_DURATION = 4000;
   let stopTimeoutId = null;
   let isRunning = false;
-  
-  // 💡 アプリ内部でのみ使うデータ受け渡し用変数
   let draggedImageUrl = null;
   
   let currentTierLimits = {...TIER_INITIAL_LIMITS}; 
@@ -82,6 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const themeInput = document.getElementById("theme-input");
   const themeDisplay = document.getElementById("theme-display");
   
+  // 画像要素とカバー要素
   const randomImage = document.getElementById("random-image");
   const dragOverlay = document.getElementById("drag-overlay");
   
@@ -205,21 +211,15 @@ document.addEventListener("DOMContentLoaded", () => {
         const ph = document.createElement("div");
         ph.className = "placeholder empty";
         ph.dataset.filled = "false";
-        ph.addEventListener("dragover", e => { 
-            e.preventDefault(); 
-            ph.classList.add("drag-over"); 
-        });
-        ph.addEventListener("dragleave", e => { 
-            ph.classList.remove("drag-over"); 
-        });
+        
+        // ドラッグ＆ドロップイベント
         ph.addEventListener("drop", e => {
-          e.preventDefault();
-          ph.classList.remove("drag-over");
-          // 💡 内部変数からURLを取得
+          // 内部変数からURLを取得
           if (draggedImageUrl) {
               placeIntoPlaceholder(ph, draggedImageUrl);
           }
         });
+        
         slot.appendChild(ph);
       }
     });
@@ -292,19 +292,18 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       return;
     }
-    // 💡 内部変数にURLを保存 (これが正解)
+    // URLを内部変数に保存
     draggedImageUrl = currentImageSrc;
     
-    // 💡 ブラウザには「ダミーデータ」を渡す (これがタブ開き防止の鍵)
-    e.dataTransfer.setData("text/plain", "dummy_data");
+    // 💡 タブが開くのを防ぐため、URLではなく空のテキストをセット
+    e.dataTransfer.setData("text/plain", ""); 
     e.dataTransfer.effectAllowed = "move";
 
-    try {
-      // 見た目は画像にする
-      const img = new Image();
-      img.src = currentImageSrc;
-      e.dataTransfer.setDragImage(randomImage, 40, 40); 
-    } catch (err) { /* ignore */ }
+    // 💡 ドラッグ中の見た目は「今表示されている画像要素(randomImage)」を使う
+    // これならロード待ちがなく、確実に表示されます
+    if (randomImage) {
+        e.dataTransfer.setDragImage(randomImage, 40, 40);
+    }
   }
   
   function placeIntoPlaceholder(ph, src) {
