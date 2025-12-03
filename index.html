@@ -35,8 +35,7 @@
 
     <div id="random-area">
       <div id="random-box">
-        <img id="random-image" src="" alt="" draggable="false">
-        <div id="drag-overlay" draggable="false" oncontextmenu="return false;"></div>
+        <div id="random-image-panel"></div>
       </div>
     </div>
     
@@ -63,7 +62,7 @@
 </div>
 </div>
 
-<div id="settings-overlay">
+<div id="settings-overlay" class="hidden-overlay">
   <div id="settings-popup">
     <h2>Tierメーカー設定</h2>
 
@@ -100,7 +99,7 @@
       </div>
     </div>
 
-    <div class="popup-actions">
+    <div class="controls">
       <button id="save-settings-btn">設定を保存</button>
       <button id="cancel-settings-btn">キャンセル</button>
     </div>
