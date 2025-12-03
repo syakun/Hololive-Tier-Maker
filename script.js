@@ -4,23 +4,18 @@
 
 document.addEventListener("DOMContentLoaded", () => {
   
-  // ============================================================
-  // 💡 【重要】新しいタブが開くのを防ぐための全体設定
-  // ============================================================
+  // タブが開くのを防ぐための全体設定
   window.addEventListener("dragover", function(e) {
-    e.preventDefault(); // ブラウザ標準のドラッグ動作をキャンセル
-    e.dataTransfer.dropEffect = "move"; // カーソルの見た目を「移動」にする
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
   }, false);
-
   window.addEventListener("drop", function(e) {
-    e.preventDefault(); // ブラウザ標準のドロップ動作（タブを開く等）をキャンセル
+    e.preventDefault();
   }, false);
-  // ============================================================
-
 
   const MAX_INDEX = 63;
   const ORIGINAL_IMAGES = [];
-  // 画像ファイル名を「0.png 〜 63.png」として読み込む
+  // 💡 修正: 0.png, 1.png... を読み込む
   for (let i = 0; i <= MAX_INDEX; i++) {
     const fileName = String(i); 
     ORIGINAL_IMAGES.push(`images/${fileName}.png`);
@@ -81,8 +76,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const themeInput = document.getElementById("theme-input");
   const themeDisplay = document.getElementById("theme-display");
   
-  const randomImage = document.getElementById("random-image");
-  const dragOverlay = document.getElementById("drag-overlay");
+  // 💡 修正: 背景画像パネルを取得
+  const randomImagePanel = document.getElementById("random-image-panel");
   
   const overlay = document.getElementById("overlay");
   const completionActions = document.getElementById("completion-actions");
@@ -141,7 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   settingsBtn.addEventListener("click", () => {
       syncSettingsToUI(); 
-      settingsOverlay.classList.remove("hidden-overlay");
       settingsOverlay.style.display = "flex";
   });
 
@@ -161,12 +155,10 @@ document.addEventListener("DOMContentLoaded", () => {
       currentTierLimits = limits;
       currentCategories = categories;
       settingsOverlay.style.display = "none";
-      settingsOverlay.classList.add("hidden-overlay");
   });
 
   cancelSettingsBtn.addEventListener("click", () => {
       settingsOverlay.style.display = "none";
-      settingsOverlay.classList.add("hidden-overlay");
   });
 
   function getSelectedImagePool(categories) {
@@ -214,7 +206,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ph.addEventListener("drop", e => {
           e.preventDefault();
           ph.classList.remove("drag-over");
-          // 内部変数からURLを取得して処理
           if (draggedImageUrl) {
               placeIntoPlaceholder(ph, draggedImageUrl);
           }
@@ -254,18 +245,19 @@ document.addEventListener("DOMContentLoaded", () => {
   function startRandomCycle() {
     if (isRunning) return;
     if (images.length === 0) {
-      randomImage.src = "";
+      randomImagePanel.style.backgroundImage = 'none';
       randomArea.classList.add("hidden"); 
       return;
     }
 
     isRunning = true;
-    dragOverlay.draggable = false; 
+    randomImagePanel.draggable = false; 
 
     intervalId = setInterval(() => {
       const idx = Math.floor(Math.random() * images.length);
       currentImageSrc = images[idx];
-      randomImage.src = currentImageSrc;
+      // 💡 背景画像としてセット
+      randomImagePanel.style.backgroundImage = `url('${currentImageSrc}')`;
     }, 50);
 
     stopTimeoutId = setTimeout(() => {
@@ -281,9 +273,10 @@ document.addEventListener("DOMContentLoaded", () => {
     clearTimeout(stopTimeoutId);
     stopTimeoutId = null;
 
-    dragOverlay.draggable = true;
-    dragOverlay.classList.add('draggable-active');
-    dragOverlay.addEventListener("dragstart", dragStartHandler);
+    // 💡 DIVをドラッグ可能にする
+    randomImagePanel.draggable = true;
+    randomImagePanel.classList.add('draggable-active');
+    randomImagePanel.addEventListener("dragstart", dragStartHandler);
   }
 
   function dragStartHandler(e) {
@@ -291,16 +284,16 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       return;
     }
-    // 内部変数にURLを保存
     draggedImageUrl = currentImageSrc;
     
-    // 💡 重要修正: URLを含まないダミーデータをセットする
-    // これによりブラウザは「これはリンクではない」と判断し、タブを開かなくなる
-    e.dataTransfer.setData("text/plain", "dragged-item");
-    e.dataTransfer.effectAllowed = "move";
-
+    // ダミーデータをセット（タブ開き防止）
+    e.dataTransfer.setData("text/plain", "drag-item");
+    
+    // 💡 ドラッグ中の見た目（ゴースト画像）を作成してセット
     try {
-      e.dataTransfer.setDragImage(randomImage, 40, 40); 
+      const img = new Image();
+      img.src = currentImageSrc;
+      e.dataTransfer.setDragImage(img, 40, 40); 
     } catch (err) { /* ignore */ }
   }
   
@@ -318,9 +311,9 @@ document.addEventListener("DOMContentLoaded", () => {
     removeImageFromPool(src);
 
     draggedImageUrl = null;
-    dragOverlay.removeEventListener("dragstart", dragStartHandler);
-    dragOverlay.draggable = false;
-    dragOverlay.classList.remove('draggable-active');
+    randomImagePanel.removeEventListener("dragstart", dragStartHandler);
+    randomImagePanel.draggable = false;
+    randomImagePanel.classList.remove('draggable-active');
 
     if (!checkAllFilled()) {
       setTimeout(() => {
@@ -338,9 +331,9 @@ document.addEventListener("DOMContentLoaded", () => {
       clearTimeout(stopTimeoutId);
       isRunning = false;
       
-      dragOverlay.draggable = false;
-      dragOverlay.removeEventListener("dragstart", dragStartHandler);
-      randomImage.src = "";
+      randomImagePanel.draggable = false;
+      randomImagePanel.removeEventListener("dragstart", dragStartHandler);
+      randomImagePanel.style.backgroundImage = 'none';
       randomArea.classList.add("hidden"); 
     } else {
       currentImageSrc = null;
@@ -356,14 +349,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function showCompletePopup() {
-    overlay.classList.remove("hidden-overlay");
     overlay.style.display = "flex";
     completionActions.classList.add("hidden"); 
   }
 
   viewBtn.addEventListener("click", () => {
     overlay.style.display = "none";
-    overlay.classList.add("hidden-overlay");
     completionActions.classList.remove("hidden");
   });
 
@@ -422,10 +413,11 @@ document.addEventListener("DOMContentLoaded", () => {
     currentImageSrc = null;
     draggedImageUrl = null;
 
-    randomImage.src = "";
-    dragOverlay.draggable = false;
-    dragOverlay.removeEventListener("dragstart", dragStartHandler);
-    dragOverlay.classList.remove('draggable-active');
+    // リセット
+    randomImagePanel.style.backgroundImage = 'none';
+    randomImagePanel.draggable = false;
+    randomImagePanel.removeEventListener("dragstart", dragStartHandler);
+    randomImagePanel.classList.remove('draggable-active');
 
     startScreen.classList.remove("hidden");
     mainScreen.classList.add("hidden");
