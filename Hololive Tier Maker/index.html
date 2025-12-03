@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hololive Tier Maker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <div id="start-screen">
+    <h1>好きなTierを決めてください</h1>
+    
+    <div id="theme-input-wrap">
+      <input id="theme-input" type="text" placeholder="例：付き合ってみたいホロメンTier"/>
+      <button id="update-theme-btn" title="お題を変更">🔄</button>
+    </div>
+
+    <div class="controls">
+      <button id="start-btn">START</button>
+    </div>
+
+    <div class="controls secondary-controls">
+        <button id="settings-btn">設定</button>
+    </div>
+
+    <p class="hint">STARTを押すと開始。ドラッグ＆ドロップで枠に入れてください。</p>
+  </div>
+
+  <div id="main-screen" class="hidden">
+
+    <div id="random-area">
+      <div id="random-box">
+        <img id="random-image" src="" alt="ランダム画像" draggable="false">
+      </div>
+    </div>
+    
+    <div id="tier-capture-area"> 
+        <div id="tiers-wrap">
+          <h2 id="theme-display">Tier表</h2> 
+          <div id="tiers">
+    
+            <div class="tier-row" data-tier="S"><div class="tier-label s">S</div><div class="slot"></div></div>
+    
+            <div class="tier-row" data-tier="A"><div class="tier-label a">A</div><div class="slot"></div></div>
+    
+            <div class="tier-row" data-tier="B"><div class="tier-label b">B</div><div class="slot"></div></div>
+    
+            <div class="tier-row" data-tier="C"><div class="tier-label c">C</div><div class="slot"></div></div>
+    
+            <div class="tier-row" data-tier="D"><div class="tier-label d">D</div><div class="slot"></div></div>
+    
+          </div>
+        </div>
+    </div>
+    
+    <div class="controls action-controls hidden" id="completion-actions">
+      <button id="save-btn">画像として保存</button>
+      <button id="tweet-btn">X (旧Twitter) に投稿</button>
+      <button id="main-restart-btn">最初からやり直す</button>
+    </div>
+  </div>
+
+</div>
+
+<div id="settings-overlay" class="hidden-overlay">
+  <div id="settings-popup">
+    <h2>Tierメーカー設定</h2>
+
+    <h3>使用する画像を選択</h3>
+    <div id="image-category-selection">
+      <label><input type="checkbox" name="category" value="JP" checked> JP</label>
+      <label><input type="checkbox" name="category" value="ID" checked> ID</label>
+      <label><input type="checkbox" name="category" value="EN" checked> EN</label>
+      <label><input type="checkbox" name="category" value="DEV_IS" checked> DEV_IS</label>
+    </div>
+    <p class="hint small-hint">※何も選択しない場合、全画像が対象となります。</p>
+
+    <h3>Tier枠数の設定</h3>
+    <div id="tier-limit-controls">
+      <div class="tier-limit-group">
+        <label for="limit-S">S (最大):</label>
+        <input type="number" id="limit-S" data-tier="S" value="1" min="0" max="64">
+      </div>
+      <div class="tier-limit-group">
+        <label for="limit-A">A (最大):</label>
+        <input type="number" id="limit-A" data-tier="A" value="2" min="0" max="64">
+      </div>
+      <div class="tier-limit-group">
+        <label for="limit-B">B (最大):</label>
+        <input type="number" id="limit-B" data-tier="B" value="3" min="0" max="64">
+      </div>
+      <div class="tier-limit-group">
+        <label for="limit-C">C (最大):</label>
+        <input type="number" id="limit-C" data-tier="C" value="4" min="0" max="64">
+      </div>
+      <div class="tier-limit-group">
+        <label for="limit-D">D (最大):</label>
+        <input type="number" id="limit-D" data-tier="D" value="5" min="0" max="64">
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="save-settings-btn">設定を保存</button>
+      <button id="cancel-settings-btn">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<div id="overlay">
+  <div id="popup">
+    <h2>完成！</h2>
+    <div id="popup-actions-wrap" class="popup-actions">
+      <button id="view-btn">完成を見る</button>
+    </div>
+    <p class="hint">完成を見たら、Tier表の下にあるボタンから保存・投稿できます。</p>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</body>
+</html>
