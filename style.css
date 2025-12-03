@@ -36,11 +36,11 @@ html, body {
   overflow-y: auto; 
 }
 
-.draggable-active {
-  cursor: grab;
-}
-.draggable-active:active {
-  cursor: grabbing;
+/* 💡 配置モード: 画像が止まったら空き枠をクリックしやすくする */
+.placing-mode .placeholder.empty {
+  cursor: pointer;
+  background: rgba(255, 200, 200, 0.3) !important; /* ほんのり色付けしてアピール */
+  border: 2px dashed #ff5959;
 }
 
 #start-screen {
@@ -109,8 +109,16 @@ button {
 
 #random-area {
   display: flex;
+  flex-direction: column; /* テキスト表示用に縦並び */
   justify-content: center;
+  align-items: center;
   margin-bottom: 20px; 
+}
+
+#instruction-text {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #d32f2f !important;
 }
 
 /* 画像を囲むボックス */
@@ -205,12 +213,7 @@ button {
   pointer-events: none;
 }
 
-.placeholder.drag-over {
-  outline: 3px dashed #333;
-  background: rgba(250,250,250,0.95) !important;
-}
-
-/* 💡 修正箇所: display: none; に戻しました */
+/* ポップアップ */
 #overlay, #settings-overlay {
   position: fixed;
   top: 0;

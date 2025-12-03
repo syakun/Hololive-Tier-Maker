@@ -27,8 +27,6 @@
     <div class="controls secondary-controls">
         <button id="settings-btn">設定</button>
     </div>
-
-    <p class="hint">STARTを押すと開始。ドラッグ＆ドロップで枠に入れてください。</p>
   </div>
 
   <div id="main-screen" class="hidden">
@@ -37,6 +35,7 @@
       <div id="random-box">
         <div id="random-image-panel"></div>
       </div>
+      <p id="instruction-text">画像が止まったら、入れたい枠をクリック！</p>
     </div>
     
     <div id="tier-capture-area"> 
@@ -62,7 +61,7 @@
 </div>
 </div>
 
-<div id="settings-overlay" class="hidden-overlay">
+<div id="settings-overlay">
   <div id="settings-popup">
     <h2>Tierメーカー設定</h2>
 
@@ -99,7 +98,7 @@
       </div>
     </div>
 
-    <div class="controls">
+    <div class="popup-actions">
       <button id="save-settings-btn">設定を保存</button>
       <button id="cancel-settings-btn">キャンセル</button>
     </div>
